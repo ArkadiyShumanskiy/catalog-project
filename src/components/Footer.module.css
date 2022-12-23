@@ -1,0 +1,32 @@
+.footer {
+  display: flex;
+  background-color: #fee44d;
+  height: 70px;
+}
+
+.column {
+  display: flex;
+  flex-grow: 1;
+}
+
+.logo {
+  height: 60px;
+  width: 60px;
+}
+
+.logoImage {
+  display: flex;
+}
+
+.logoText {
+  display: flex;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.logoWrapper {
+  display: flex;
+  flex-grow: 1;
+  justify-content: right;
+  align-items: center;
+}

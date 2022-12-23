@@ -1,0 +1,23 @@
+.price {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.stock {
+  font-size: 10px;
+  color: grey;
+  margin-bottom: 5px;
+}
+
+.name {
+  margin-bottom: 25px;
+}
+
+.button {
+  background-color: #fee44d;
+  border: none;
+  color: black;
+  border-radius: 20px;
+  font-weight: bold;
+  padding: 5px 15px;
+}

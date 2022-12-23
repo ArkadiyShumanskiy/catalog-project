@@ -1,24 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import Container from "react-bootstrap/Container";
+
+import { Header } from "./components/Header";
+import { Main } from "./components/Main";
+import { Footer } from "./components/Footer";
+import { User } from "./pages/User";
+
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
+  const isRegisteredInStorage = Boolean(localStorage.getItem("registered"));
+  const [isRegistered, setIsRegistered] = useState(isRegisteredInStorage);
+  const isAuthorizedInStorage = Boolean(localStorage.getItem("authorized"));
+  const [isAuthorized, setIsAuthorized] = useState(isAuthorizedInStorage);
+  const [page, setPage] = useState("catalog");
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Header onOpenUserPageClick={setPage} isAuthorized={isAuthorized} />
+      <Container>
+        {page === "catalog" && (
+          <Main
+            isRegistered={isRegistered}
+            isAuthorized={isAuthorized}
+            setIsRegistered={setIsRegistered}
+            setIsAuthorized={setIsAuthorized}
+          />
+        )}
+        {page === "user" && <User />}
+      </Container>
+      <Footer />
+    </>
   );
 }
 
