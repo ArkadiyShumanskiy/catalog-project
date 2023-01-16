@@ -1,6 +1,6 @@
 import Card from "react-bootstrap/Card";
 import CardGroup from "react-bootstrap/CardGroup";
-import { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 
 import { CatalogItem } from "./CatalogItem";
 import { getCatalog } from "../api";
@@ -8,27 +8,19 @@ import { getCatalog } from "../api";
 import styles from "./Catalog.module.css";
 
 export const Catalog = () => {
-  const [items, setItems] = useState([]);
+  const catalogQuery = useQuery("catalog", async () => {
+    const response = await getCatalog();
 
-  useEffect(() => {
-    getCatalog()
-      .then((response) => {
-        if (response.ok) {
-          response.json().then((responseJson) => {
-            setItems(responseJson.products);
-          });
-        } else {
-          console.log(response);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+    if (!response.ok) {
+      console.log(response);
+    }
+
+    return response.json();
+  });
 
   return (
     <div className={styles.catalog}>
-      {items.map((item) => (
+      {catalogQuery.data?.products.map((item) => (
         <CatalogItem key={item._id} {...item} />
       ))}
     </div>

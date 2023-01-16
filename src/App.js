@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Container from "react-bootstrap/Container";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 import { Header } from "./components/Header";
 import { Main } from "./components/Main";
@@ -7,6 +8,8 @@ import { Footer } from "./components/Footer";
 import { User } from "./pages/User";
 
 import "bootstrap/dist/css/bootstrap.min.css";
+
+const queryClient = new QueryClient();
 
 function App() {
   const isRegisteredInStorage = Boolean(localStorage.getItem("registered"));
@@ -16,7 +19,7 @@ function App() {
   const [page, setPage] = useState("catalog");
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <Header onOpenUserPageClick={setPage} isAuthorized={isAuthorized} />
       <Container>
         {page === "catalog" && (
@@ -30,7 +33,7 @@ function App() {
         {page === "user" && <User />}
       </Container>
       <Footer />
-    </>
+    </QueryClientProvider>
   );
 }
 

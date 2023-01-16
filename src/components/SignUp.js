@@ -1,6 +1,7 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useState } from "react";
+import { useMutation } from "react-query";
 
 import { register } from "../api";
 
@@ -10,26 +11,23 @@ export const SignUp = (props) => {
   const [group, setGroup] = useState("");
   const [password, setPassword] = useState("");
 
+  const signupMutation = useMutation(register, {
+    onSuccess: () => {
+      localStorage.setItem("registered", "true");
+      setIsRegistered(true);
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   const onClick = () => {
     const form = {
       email: email,
       group: group,
       password: password,
     };
-    register(form)
-      .then((response) => {
-        if (response.ok) {
-          response.json().then(() => {
-            localStorage.setItem("registered", "true");
-            setIsRegistered(true);
-          });
-        } else {
-          console.log(response);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    signupMutation.mutate(form);
   };
 
   return (

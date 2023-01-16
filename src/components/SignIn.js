@@ -1,6 +1,7 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useState } from "react";
+import { useMutation } from "react-query";
 
 import { authorize } from "../api";
 
@@ -9,26 +10,27 @@ export const SignIn = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const signinMutation = useMutation(authorize, {
+    onSuccess: (response) => {
+      if (response.ok) {
+        response.json().then((responseJSON) => {
+          localStorage.setItem("authorized", "true");
+          localStorage.setItem("token", responseJSON.token);
+          setIsAuthorized(true);
+        });
+      }
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   const onClick = () => {
     const form = {
       email: email,
       password: password,
     };
-    authorize(form)
-      .then((response) => {
-        if (response.ok) {
-          response.json().then((responseJSON) => {
-            localStorage.setItem("authorized", "true");
-            localStorage.setItem("token", responseJSON.token);
-            setIsAuthorized(true);
-          });
-        } else {
-          console.log(response);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    signinMutation.mutate(form);
   };
 
   return (
