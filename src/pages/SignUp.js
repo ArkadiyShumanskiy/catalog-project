@@ -1,20 +1,25 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useState } from "react";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
+import { useDispatch } from "react-redux";
 
 import { register } from "../api";
+import { setRegistered } from "../store/tokenSlice";
 
-export const SignUp = (props) => {
-  const { setIsRegistered } = props;
+export const SignUp = () => {
   const [email, setEmail] = useState("");
   const [group, setGroup] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
 
   const signupMutation = useMutation(register, {
-    onSuccess: () => {
-      localStorage.setItem("registered", "true");
-      setIsRegistered(true);
+    onSuccess: (response) => {
+      if (response.ok || (!response.ok && response.status === 409)) {
+        response.json().then(() => {
+          dispatch(setRegistered(true));
+        });
+      }
     },
     onError: (error) => {
       console.log(error);

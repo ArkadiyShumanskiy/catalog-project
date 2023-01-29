@@ -18,22 +18,32 @@ export const authorize = (form) => {
   });
 };
 
-export const getCatalog = () => {
+export const getProducts = (token) => {
   return fetch("https://api.react-learning.ru/products", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      authorization: `Bearer ${localStorage.getItem("token")}`,
+      authorization: `Bearer ${token}`,
     },
   });
 };
 
-export const getCurrentUser = () => {
+export const getProductsByIds = (token, productIds) => {
+  return Promise.all(productIds.map((productId) => fetch(`https://api.react-learning.ru/products/${productId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      authorization: `Bearer ${token}`,
+    },
+  }).then(resp => resp.json())));
+};
+
+export const getCurrentUser = (token) => {
   return fetch("https://api.react-learning.ru/v2/sm8/users/me", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      authorization: `Bearer ${localStorage.getItem("token")}`,
+      authorization: `Bearer ${token}`,
     },
   });
 };

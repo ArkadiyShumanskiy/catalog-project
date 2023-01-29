@@ -36,7 +36,9 @@
   border-radius: 20px;
 }
 
-.userButton {
+.button {
   margin: 15px;
+  padding: 5px 15px;
+  border: gray 1px solid;
   border-radius: 20px;
 }

@@ -1,11 +1,13 @@
 import Card from "react-bootstrap/Card";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
 
 import { getCurrentUser } from "../api";
 
 export const User = () => {
-  const userQuery = useQuery("user", async () => {
-    const response = await getCurrentUser();
+  const token = useSelector((state) => state.tokenSlice.token);
+  const userQuery = useQuery(["user"], async () => {
+    const response = await getCurrentUser(token);
 
     if (!response.ok) {
       console.log(response);

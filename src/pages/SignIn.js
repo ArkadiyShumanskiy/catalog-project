@@ -1,22 +1,24 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useState } from "react";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import { authorize } from "../api";
+import { setToken } from "../store/tokenSlice";
 
-export const SignIn = (props) => {
-  const { setIsAuthorized } = props;
+export const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const signinMutation = useMutation(authorize, {
     onSuccess: (response) => {
       if (response.ok) {
         response.json().then((responseJSON) => {
-          localStorage.setItem("authorized", "true");
-          localStorage.setItem("token", responseJSON.token);
-          setIsAuthorized(true);
+          dispatch(setToken(responseJSON.token));
         });
       }
     },
@@ -25,12 +27,13 @@ export const SignIn = (props) => {
     },
   });
 
-  const onClick = () => {
+  const onClick = async () => {
     const form = {
       email: email,
       password: password,
     };
-    signinMutation.mutate(form);
+    await signinMutation.mutateAsync(form);
+    navigate("catalog");
   };
 
   return (

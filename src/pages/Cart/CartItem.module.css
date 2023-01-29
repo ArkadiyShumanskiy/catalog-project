@@ -1,0 +1,15 @@
+.row {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.price {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.img {
+  width: 50px;
+  border: #ccc 1px solid;
+  border-radius: 3px;
+}
