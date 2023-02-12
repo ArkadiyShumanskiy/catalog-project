@@ -1,19 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import Button from 'react-bootstrap/Button';
+import { Button } from 'reactstrap';
 
 import { CartItem } from "./CartItem";
 import { getProductsByIds } from "../../api";
-
-import styles from './Cart.module.css'
 
 export const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const token = useSelector((state) => state.tokenSlice.token);
   const items = useSelector((state) => state.cartSlice.items);
   const chosenItems = useSelector((state) => state.cartSlice.chosenItemsIds);
-  const itemsIds = items.map((itemId) => itemId.id);
+  const itemsIds = useMemo(() => items.map((item) => item.id), [items]);
 
   const fetchProducts = async (itemsIds) => {
     const response = await getProductsByIds(token, itemsIds);
@@ -23,7 +21,7 @@ export const Cart = () => {
 
   useEffect(() => {
     fetchProducts(itemsIds);
-  }, []);
+  }, [itemsIds]);
 
   const chekout = () => {
     const chosenItemsSum = cartItems
@@ -33,8 +31,6 @@ export const Cart = () => {
         sum += (item.price - item.price*item.discount/100) * chosenItemCount;
         return sum;
       }, 0);
-
-    console.log(cartItems.filter((item) => chosenItems.includes(item._id)))
 
     alert(`Для оформления было выбрано ${chosenItems?.length} товаров на сумму ${chosenItemsSum} с учетом скидок`);
   };
@@ -46,13 +42,13 @@ export const Cart = () => {
           <div>Корзина пуста</div>
         )}
         {cartItems.map((item) => (
-          <CartItem key={item._id} onRemove={fetchProducts} {...item} />
+          <CartItem key={item._id} {...item} />
         ))}
       </div>
       <div>
         <Link to="/">В каталог</Link>
       </div>
-      <div className={styles.actions}>
+      <div style={{ marginTop: 16, marginBottom: 8 }}>
         <Button variant="success" disabled={!chosenItems?.length} onClick={chekout}>
           Перейти к оформлению
         </Button>

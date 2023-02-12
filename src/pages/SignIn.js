@@ -1,18 +1,27 @@
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
 import { useState } from "react";
+import { Button, Alert } from "reactstrap";
 import { useMutation } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Field, Form, Formik } from "formik";
+import { ReactstrapInput } from "reactstrap-formik";
+import * as Yup from 'yup';
 
 import { authorize } from "../api";
 import { setToken } from "../store/tokenSlice";
+import { buttonStyle } from "../constants/styles";
+
+const SigninSchema = Yup.object().shape({
+  email: Yup.string()
+    .email('Invalid email')
+    .required('Required'),
+  password: Yup.string()
+    .min(6)
+    .required('Required'),
+});
 
 export const SignIn = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const [signInError, setSignInError] = useState();
 
   const signinMutation = useMutation(authorize, {
     onSuccess: (response) => {
@@ -20,51 +29,41 @@ export const SignIn = () => {
         response.json().then((responseJSON) => {
           dispatch(setToken(responseJSON.token));
         });
+      } else {
+        setSignInError(response.statusText);
       }
     },
     onError: (error) => {
-      console.log(error);
+      setSignInError(error);
     },
   });
 
-  const onClick = async () => {
-    const form = {
-      email: email,
-      password: password,
-    };
-    await signinMutation.mutateAsync(form);
-    navigate("catalog");
-  };
-
   return (
-    <Form>
-      <Form.Group className="mb-3">
-        <Form.Label>Email address</Form.Label>
-        <Form.Control
-          value={email}
-          onChange={(event) => {
-            setEmail(event.target.value);
-          }}
-          type="email"
-          placeholder="Enter email"
-        />
-      </Form.Group>
+    <Formik
+      initialValues={{
+        email: '',
+        password: '',
+       }}
+       validationSchema={SigninSchema}
+       onSubmit={async values => {
+        await signinMutation.mutateAsync(values);
+       }}
+     >
+      <Form>
+        {signInError && (
+          <Alert color="danger">
+            {signInError}
+          </Alert>
+        )}
+        <Field label="Email address" name="email" component={ReactstrapInput} />
+        <Field type="password" label="Password" name="password" component={ReactstrapInput} />
 
-      <Form.Group className="mb-3">
-        <Form.Label>Password</Form.Label>
-        <Form.Control
-          value={password}
-          onChange={(event) => {
-            setPassword(event.target.value);
-          }}
-          type="password"
-          placeholder="Password"
-        />
-      </Form.Group>
-
-      <Button onClick={onClick} variant="primary" type="button">
-        Authorize
-      </Button>
-    </Form>
+        <div style={{ marginTop: 24 }}>
+          <Button style={buttonStyle} type="submit" color="primary">
+            Authorize
+          </Button>
+        </div>
+      </Form>
+    </Formik>
   );
 };

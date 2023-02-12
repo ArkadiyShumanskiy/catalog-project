@@ -8,6 +8,7 @@ import styles from "./Catalog.module.css";
 
 export const Catalog = () => {
   const token = useSelector((state) => state.tokenSlice.token);
+  const isAuthorized = Boolean(token);
 
   const catalogQuery = useQuery(["products"], async () => {
     const response = await getProducts(token);
@@ -17,7 +18,7 @@ export const Catalog = () => {
     }
 
     return response.json();
-  });
+  }, { enabled: isAuthorized });
 
   return (
     <div className={styles.catalog}>

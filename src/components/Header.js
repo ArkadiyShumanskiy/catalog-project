@@ -1,17 +1,19 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import Button from "react-bootstrap/Button";
-import Badge from 'react-bootstrap/Badge';
-import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
+import { Button, Row, Col, Input, CardImg } from "reactstrap";
+
+import { buttonStyle } from '../constants/styles';
 
 import styles from "./Header.module.css";
 import logo from "../assets/dogFood.png";
 
+const headerButtonStyle = { ...buttonStyle, marginTop: 16, marginBottom: 16, marginLeft: 8 };
+const searchStyle = { margin: 16, borderRadius: 20 }
+
 export const Header = (props) => {
   const token = useSelector((state) => state.tokenSlice.token);
   const itemsCount = useSelector((state) => state.cartSlice.items.length);
+  const favoritesCount = useSelector((state) => state.favoriteSlice.items.length);
   const isAuthorized = Boolean(token);
   const navigate = useNavigate();
 
@@ -19,30 +21,46 @@ export const Header = (props) => {
     <Row className={styles.header}>
       <Col className={styles.logoWrapper}>
         <div className={styles.logoImage}>
-          <img className={styles.logo} src={logo}></img>
+          <Link to="/">
+            <CardImg className={styles.logo} src={logo} />
+          </Link>
         </div>
-        <div className={styles.logoText}>DogFood</div>
+        <Link to="/" className={styles.logoText}>DogFood</Link>
       </Col>
       <Col className={styles.column}>
-        <Form.Control type="text" className={styles.search} />
+        <Input style={searchStyle} />
       </Col>
-      <Col className={styles.column}>
+      <Col className={styles.userColumn}>
         {isAuthorized && (
-          <button
-            className={styles.button}
+          <Button
+            style={headerButtonStyle}
             onClick={() => navigate("/user")}
+            size="sm"
+            outline
           >
-            User Info
-          </button>
+            Информация о юзере
+          </Button>
         )}
+        {favoritesCount > 0 && (
+          <Button
+            style={headerButtonStyle}
+            onClick={() => navigate("/favorites")}
+            size="sm"
+            outline
+          >
+            Избранное {favoritesCount}
+          </Button>
+        )} 
       </Col>
       <Col className={styles.column}>
-        <button
-          className={styles.button}
+        <Button
+          style={headerButtonStyle}
           onClick={() => navigate("/cart")}
+          size="sm"
+          outline
         >
-          Cart {itemsCount}
-        </button>
+          Корзина {itemsCount}
+        </Button>
       </Col>
     </Row>
   );

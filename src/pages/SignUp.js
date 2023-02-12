@@ -1,17 +1,29 @@
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
 import { useState } from "react";
+import { Button, Alert } from "reactstrap";
 import { useMutation } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
+import { Field, Form, Formik } from "formik";
+import { ReactstrapInput } from "reactstrap-formik";
+import * as Yup from 'yup';
 
 import { register } from "../api";
+import { buttonStyle } from "../constants/styles";
 import { setRegistered } from "../store/tokenSlice";
 
+const SignupSchema = Yup.object().shape({
+  email: Yup.string()
+    .email('Invalid email')
+    .required('Required'),
+  group: Yup.string()
+    .required('Required'),
+  password: Yup.string()
+    .min(6)
+    .required('Required'),
+});
+
 export const SignUp = () => {
-  const [email, setEmail] = useState("");
-  const [group, setGroup] = useState("");
-  const [password, setPassword] = useState("");
   const dispatch = useDispatch();
+  const [signUpError, setSignUpError] = useState();
 
   const signupMutation = useMutation(register, {
     onSuccess: (response) => {
@@ -19,63 +31,43 @@ export const SignUp = () => {
         response.json().then(() => {
           dispatch(setRegistered(true));
         });
+      } else {
+        setSignUpError(response.statusText);
       }
     },
     onError: (error) => {
-      console.log(error);
+      setSignUpError(error);
     },
   });
 
-  const onClick = () => {
-    const form = {
-      email: email,
-      group: group,
-      password: password,
-    };
-    signupMutation.mutate(form);
-  };
-
   return (
-    <Form>
-      <Form.Group className="mb-3">
-        <Form.Label>Email address</Form.Label>
-        <Form.Control
-          value={email}
-          onChange={(event) => {
-            setEmail(event.target.value);
-          }}
-          type="email"
-          placeholder="Enter email"
-        />
-      </Form.Group>
+    <Formik
+      initialValues={{
+        email: '',
+        group: '',
+        password: '',
+       }}
+       validationSchema={SignupSchema}
+       onSubmit={values => {
+         signupMutation.mutate(values);
+       }}
+     >
+      <Form>
+        {signUpError && (
+          <Alert color="danger">
+            {signUpError}
+          </Alert>
+        )}
+        <Field label="Email address" name="email" component={ReactstrapInput} />
+        <Field label="Group" name="group" component={ReactstrapInput} />
+        <Field type="password" label="Password" name="password" component={ReactstrapInput} />
 
-      <Form.Group className="mb-3">
-        <Form.Label>Group</Form.Label>
-        <Form.Control
-          value={group}
-          onChange={(event) => {
-            setGroup(event.target.value);
-          }}
-          type="text"
-          placeholder="Enter group"
-        />
-      </Form.Group>
-
-      <Form.Group className="mb-3">
-        <Form.Label>Password</Form.Label>
-        <Form.Control
-          value={password}
-          onChange={(event) => {
-            setPassword(event.target.value);
-          }}
-          type="password"
-          placeholder="Password"
-        />
-      </Form.Group>
-
-      <Button onClick={onClick} variant="primary" type="button">
-        Register
-      </Button>
-    </Form>
+        <div style={{ marginTop: 24 }}>
+          <Button style={buttonStyle} type="submit" color="primary">
+            Register
+          </Button>
+        </div>
+      </Form>
+    </Formik>
   );
 };

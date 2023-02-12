@@ -12,6 +12,7 @@ import {
 
 import tokenReducer from "./tokenSlice";
 import cartReducer from "./cartSlice";
+import favoriteReducer from "./favoriteSlice";
 
 const persistConfig = {
   key: "root",
@@ -22,6 +23,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   tokenSlice: tokenReducer,
   cartSlice: cartReducer,
+  favoriteSlice: favoriteReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
